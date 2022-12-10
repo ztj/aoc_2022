@@ -60,10 +60,6 @@ mod fs {
         pub fn size(&self) -> u64 {
             self.size
         }
-
-        pub fn name(&self) -> &str {
-            &self.name
-        }
     }
 
     impl std::fmt::Display for INode {
@@ -186,11 +182,6 @@ mod fs {
             Err(Error::NotFound)
         }
 
-        pub fn with<R, F: FnOnce(&INode) -> R>(&self, handle: Handle, f: F) -> Result<R> {
-            let inode = self.data.get(handle.0).ok_or(Error::NotFound)?;
-            Ok(f(inode))
-        }
-
         pub fn cd<P: AsRef<Path>>(&self, cwd: Handle, path: P) -> Result<Handle> {
             let mut handle = cwd;
             for component in path.as_ref().components() {
@@ -230,28 +221,6 @@ mod fs {
             } else {
                 Err(Error::NotADirectory)
             }
-        }
-
-        fn print_tree_impl(&self, handle: Handle, depth: usize) {
-            let inode = self.data.get(handle.0).unwrap();
-            println!(
-                "{}{}",
-                "  ".repeat(depth),
-                if inode.is_dir() {
-                    format!("- {} (dir)", inode.name)
-                } else {
-                    format!("- {} (file, size={})", inode.name, inode.size)
-                }
-            );
-            if let Some(children) = inode.children.as_ref() {
-                for child in children {
-                    self.print_tree_impl(*child, depth + 1);
-                }
-            }
-        }
-
-        pub fn print_tree(&self) {
-            self.print_tree_impl(self.root, 0);
         }
     }
 }
