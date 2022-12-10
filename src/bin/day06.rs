@@ -9,7 +9,6 @@ fn all_unique(bytes: &[u8]) -> bool {
     !tail.contains(&head[0]) && all_unique(tail)
 }
 
-// I wrote this one before I decided to split up part 1 & 2 executions
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = aoc::Args::parse();
     let path = if cli.real {
