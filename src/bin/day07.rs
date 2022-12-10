@@ -306,13 +306,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     } else {
         let free_space = TOTAL_SPACE - cache[&fs.root()];
         let needed_space = MIN_FREE_SPACE - free_space;
-        let mut candidates = cache
+        let answer: u64 = cache
             .iter()
-            .filter(|(_, &size)| size >= needed_space)
-            .collect::<Vec<_>>();
-        candidates.sort_by_key(|(_, &size)| size);
-        let (_, size) = candidates[0];
-        println!("{size}");
+            .filter_map(|(_, &size)| {
+                if size >= needed_space {
+                    Some(size)
+                } else {
+                    None
+                }
+            })
+            .min()
+            .unwrap();
+        println!("{answer}");
     }
     Ok(())
 }
