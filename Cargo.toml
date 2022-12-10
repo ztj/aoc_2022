@@ -11,3 +11,6 @@ name = "aoc"
 
 [dependencies]
 clap = { version = "4.0.29", features = ["derive"] }
+slotmap = { version = "1.0" }
+smallvec = { version = "1.10",  features = ["const_generics"] }
+smallstr = { version = "0.3" }
