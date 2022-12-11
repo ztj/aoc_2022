@@ -29,18 +29,6 @@ impl Grid {
         self.data.extend_from_slice(row);
     }
 
-    fn height(&self) -> usize {
-        self.height
-    }
-
-    fn width(&self) -> usize {
-        if self.width > 0 {
-            self.width
-        } else {
-            panic!("Grid has no rows")
-        }
-    }
-
     fn get(&self, x: usize, y: usize) -> u8 {
         self.data[y * self.width + x]
     }
@@ -90,6 +78,45 @@ impl Grid {
         }
         count
     }
+
+    fn highest_scenic_score(&self) -> u64 {
+        let mut top_score: u64 = 0;
+        for y in 0..self.height {
+            for x in 0..self.width {
+                let height = self.get(x, y);
+                let mut west_score: u64 = 0;
+                let mut east_score: u64 = 0;
+                let mut north_score: u64 = 0;
+                let mut south_score: u64 = 0;
+                for west in (0..x).rev() {
+                    west_score += 1;
+                    if self.get(west, y) >= height {
+                        break;
+                    }
+                }
+                for east in x + 1..self.width {
+                    east_score += 1;
+                    if self.get(east, y) >= height {
+                        break;
+                    }
+                }
+                for north in (0..y).rev() {
+                    north_score += 1;
+                    if self.get(x, north) >= height {
+                        break;
+                    }
+                }
+                for south in y + 1..self.height {
+                    south_score += 1;
+                    if self.get(x, south) >= height {
+                        break;
+                    }
+                }
+                top_score = top_score.max(west_score * east_score * north_score * south_score);
+            }
+        }
+        top_score
+    }
 }
 
 /// Good enough for AOC, but, could be more efficient
@@ -126,6 +153,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         })
         .for_each(|row| grid.add_row(&row));
     //println!("{}", grid);
-    println!("Visible from outside: {}", grid.visible_from_outside());
+    if !cli.part_two {
+        println!("{}", grid.visible_from_outside());
+    } else {
+        println!("{}", grid.highest_scenic_score());
+    }
     Ok(())
 }
